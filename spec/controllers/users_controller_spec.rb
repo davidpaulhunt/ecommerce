@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe UsersController, :type => :controller do
-
+  # broken down by CRUD
   context 'create' do
 
     it 'should create a user' do
@@ -50,6 +50,7 @@ describe UsersController, :type => :controller do
     end
 
     it 'should update a user\'s attributes' do
+      # get one the edit action, assign the user from id, and check update response
       get 'edit', id: @user.id
       assert_response :success
       expect(assigns(:user)).to eq @user
@@ -61,6 +62,7 @@ describe UsersController, :type => :controller do
   end
 
   context 'destroy' do
+    # destroy the lonely loser by ensure the action decreases .all.count by -1
     it 'should destroy a user from database' do
       @user = FactoryGirl.create(:user)
       expect{ delete 'destroy', id: @user.id }.to change(User, :count).by -1
