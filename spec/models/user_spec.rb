@@ -18,6 +18,13 @@ describe User, :type => :model do
       assert_equal "password", user.password
       assert_equal "password", user.password_confirmation
     end
+
+    it 'should have stores' do
+      user = FactoryGirl.create(:user)
+      store_attrs = FactoryGirl.attributes_for(:store)
+      store = user.stores.build(store_attrs)
+      expect{store.save}.to change(user.stores, :count).by 1
+    end
   end
 
   context 'invalid user' do
