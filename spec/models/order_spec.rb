@@ -21,6 +21,9 @@ describe Order, :type => :model do
       assert_equal "bob@email.com", order.email_address
       assert_equal "Beware of dog.", order.notes
       assert_equal 20.00, order.amount_paid
+      # check methods
+      assert_equal "Bob Smith", order.full_name
+      assert_equal "Bob Smith", order.customer_name
     end
 
     it 'should belong to parent objects' do
@@ -33,6 +36,15 @@ describe Order, :type => :model do
     end
 
     it 'should have children objects' do
+    end
+
+    it 'should change status' do
+      # create db accessing order
+      order = FactoryGirl.create(:order)
+      # call confirm method
+      order.confirm!
+      # check for expected status
+      assert_equal 'received', order.status
     end
 
   end
