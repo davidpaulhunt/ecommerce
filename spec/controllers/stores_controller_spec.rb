@@ -75,7 +75,6 @@ describe StoresController, :type => :controller do
       expect(assigns(:store)).to eq @store
 
       # change vars name for update
-      old_name = @store.name
       @store.name = "New Store Name"
 
       # update existing store's name
