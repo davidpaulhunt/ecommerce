@@ -4,29 +4,51 @@ describe Store, :type => :model do
 
   context 'valid store' do
 
-    before(:each) do
-      @user = FactoryGirl.create(:user)
-      store_attrs = FactoryGirl.attributes_for(:store)
-      @store = @user.stores.build(store_attrs)
-    end
-
-    after(:each) do
-      @user.destroy!
-    end
-
+    let(:store) { FactoryGirl.build_stubbed(:store) }
     it 'should be valid' do
-      assert @store.valid?
+      assert store.valid?
     end
 
     it 'should have attributes' do
-      assert_equal @user, @store.user
-      assert_equal "My Store", @store.name
-      assert_equal "www.mystore.com", @store.web_url
+      # check each attr
+      assert_equal "My Store", store.name
+      assert_equal "www.mystore.com", store.web_url
     end
 
     it 'should belong to a user' do
-      # check if user's first store is the only created store
-      assert_equal @store, @user.stores.first
+      # create user to own store
+      user = FactoryGirl.create(:user)
+      # set valid store attrs
+      store_attrs = FactoryGirl.attributes_for(:store)
+      # reset store var to user store
+      store = user.stores.build(store_attrs)
+      # check that user equals store's user
+      assert_equal user, store.user
+    end
+
+    it 'should have children objects' do
+      # save db accessible store
+      store = FactoryGirl.create(:store)
+      # get children attrs
+      product_attrs = FactoryGirl.attributes_for(:product)
+      pc_attrs = FactoryGirl.attributes_for(:product_category)
+      # build product stub and check association
+      product = store.products.build(product_attrs)
+      expect{ product.save }.to change(store.products, :count).by 1
+      # build product category stub and check association
+      pc = store.product_categories.build(pc_attrs)
+      expect{ pc.save }.to change(store.product_categories, :count).by 1
+      # check dependency
+      # save children, check new count
+      product.save
+      assert_equal 1, Product.count
+      pc.save
+      assert_equal 1, ProductCategory.count
+      # destroy parent store
+      store.destroy!
+      # check counts
+      assert_equal 0, Product.count
+      assert_equal 0, ProductCategory.count
     end
 
   end
@@ -34,28 +56,21 @@ describe Store, :type => :model do
 
   context 'invalid store' do
 
-    let(:store_attrs) { FactoryGirl.attributes_for(:store) }
-
-    before(:each) do
-      @user = FactoryGirl.create(:user)
-    end
-
-    after(:each) do
-      @user.destroy!
-    end
-
     it 'should be invalid' do
-      store = @user.stores.build(store_attrs)
+      # build stub
+      store = FactoryGirl.build_stubbed(:store)
+      # set store name to nil, validate
       store.name = nil
       assert store.invalid?
-
-      store = @user.stores.build(store_attrs)
+      # rebuild store stub
+      store = FactoryGirl.build_stubbed(:store)
+      # set store web url to nil, validate
       store.web_url = nil
       assert store.invalid?
-
-      store = @user.stores.create(store_attrs)
-
-      store2 = @user.stores.build(store_attrs)
+      # create store, build stub with same attrs
+      store = FactoryGirl.create(:store)
+      store2 = FactoryGirl.build_stubbed(:store)
+      # validate
       assert store2.invalid?
     end
 

@@ -6,5 +6,6 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password
 
   has_many :stores
+  has_many :products, through: :stores
   
 end

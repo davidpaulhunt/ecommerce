@@ -19,11 +19,21 @@ describe User, :type => :model do
       assert_equal "password", user.password_confirmation
     end
 
-    it 'should have stores' do
+    it 'should have children objects' do
+      # create a user
       user = FactoryGirl.create(:user)
+      # get valid store attrs
       store_attrs = FactoryGirl.attributes_for(:store)
+      # build store stub and check association
       store = user.stores.build(store_attrs)
       expect{store.save}.to change(user.stores, :count).by 1
+      # save store to build product
+      store.save!
+      # get valid product attrs
+      product_attrs = FactoryGirl.attributes_for(:product)
+      # build product stub and check association
+      product = store.products.build(product_attrs)
+      expect{product.save}.to change(user.products, :count).by 1
     end
   end
 
